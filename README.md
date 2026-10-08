@@ -1,58 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 Book System API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2+
+- Laravel 12
+- MySQL
+- Postman 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Database Tables
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Table | Primary Key |
+|---|---|
+| `tblBookType` | `BookTypeID` |
+| `tblAuthor` | `AuthorID` |
+| `tblBook` | `BookID` |
+| `tblBookAuthor` | `BookID` + `AuthorID` |
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Getting Started
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone the project
+git clone https://github.com/Scheasa/booksys-api.git
 
-php artisan boost:install
+# 2. Install dependencies
+composer install
+
+# 3. Create the environment file and app key
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Configure `.env`
 
-## Contributing
+Create an empty MySQL database named `booksys`, then edit `.env`:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=booksys
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Code of Conduct
+## Run the Project
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
+php artisan serve
+```
 
-## Security Vulnerabilities
+API base URL: `http://127.0.0.1:8000/api`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Testing with Postman
+### Test order (because of foreign keys)
 
-## License
+1. Book Type
+2. Author
+3. Book
+4. Book Author
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Delete in the reverse order.
+
+### Book Types: `/book-types`
+
+| Method | URL |
+|---|---|
+| GET | `/api/book-types` |
+| GET | `/api/book-types/1` |
+| POST | `/api/book-types` |
+| PUT | `/api/book-types/1` |
+| DELETE | `/api/book-types/1` |
+
+```json
+{
+  "BookTypeName": "Science"
+}
+```
+
+### Authors: `/authors`
+
+| Method | URL |
+|---|---|
+| GET | `/api/authors` |
+| GET | `/api/authors/1` |
+| POST | `/api/authors` |
+| PUT | `/api/authors/1` |
+| DELETE | `/api/authors/1` |
+
+```json
+{
+  "AuthorName": "Sok Dara",
+  "Gender": "Male",
+  "DOB": "1985-05-10",
+  "Email": "dara@example.com"
+}
+```
+
+### Books: `/books`
+
+| Method | URL |
+|---|---|
+| GET | `/api/books` |
+| GET | `/api/books/1` |
+| POST | `/api/books` |
+| PUT | `/api/books/1` |
+| DELETE | `/api/books/1` |
+
+```json
+{
+  "BookTitle": "Intro to Physics",
+  "BookTypeID": 1,
+  "PublishDate": "2024-01-15",
+  "NumOfPages": 300,
+  "NumOfCopies": 5,
+  "Edition": "1st",
+  "Publisher": "BBU Press"
+}
+```
+
+### Book Authors: `/book-authors`
+
+This table has a composite key, so single-record URLs use two IDs: `/{BookID}/{AuthorID}`.
+
+| Method | URL |
+|---|---|
+| GET | `/api/book-authors` |
+| GET | `/api/book-authors/1/1` |
+| POST | `/api/book-authors` |
+| PUT | `/api/book-authors/1/1` |
+| DELETE | `/api/book-authors/1/1` |
+
+```json
+{
+  "BookID": 1,
+  "AuthorID": 1,
+  "AuthorDate": "2024-01-15",
+  "Remark": "Main author"
+}
+```
+
+## Response Format
+
+```json
+{
+  "success": true,
+  "message": "Inserted successfully",
+  "data": {}
+}
+```
+
+| Status Code | Meaning |
+|---|---|
+| 200 | OK |
+| 201 | Created |
+| 404 | Not found |
+| 422 | Validation failed |
+| 500 | Server error |
